@@ -1,28 +1,66 @@
-![Research Poster](./public/Poster.png)
+# Perceptrix 
+Perceptrix is a web application that helps users discover glasses frames that complement their face shape. Users upload a photo, the system analyzes facial landmarks, and the application recommends frames based on facial structure. The platform also includes a virtual try-on feature that allows users to preview frames on their face. 
 
-# LOCAL SETUP (React + Vite)
+**Live Demo:** https://perceptrix2.vercel.app/ 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Research Poster 
+The original product concept and design process for Perceptrix are summarized in the following research poster. 
 
-Currently, two official plugins are available:
+![Research Poster](./public/Poster.png) 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features 
+* User authentication with Firebase Authentication
+* Image upload and storage using Firebase Storage
+* Face shape analysis using MediaPipe Face Landmarker
+* Frame recommendations based on facial structure
+* Virtual try-on feature using TensorFlow Face Landmarks Detection
 
-## Expanding the ESLint configuration
+## Tech Stack 
+* **Frontend:** JavaScript, HTML, CSS
+* **Computer Vision:** MediaPipe Face Landmarker, TensorFlow Face Landmarks Detection
+* **Backend Services:** Firebase Authentication, Firebase Storage
+* **Design:** Figma
+* **Deployment:** Vercel
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Architecture 
+Perceptrix is a browser-based application that combines facial landmark detection with Firebase-based authentication and image storage.
 
-## Steps to run:
+### Application Flow 
+1. A user signs up or logs in through Firebase Authentication
+2. The user uploads a photo through the web interface
+3. The uploaded image is stored in Firebase Storage
+4. MediaPipe Face Landmarker analyzes facial landmarks
+5. The system estimates facial structure and recommends frames
+6. Users can preview frames through the virtual try-on interface powered by TensorFlow
 
-1: `git clone` repo <br />
-2: `npm install` <br />
-3: `npm install firebase` <br />
-4: `npm install react-router-dom` <br />
+## Running the Project Locally
+**Clone the repository:**
 
-start the web app development mode (can actively see changes): <br />
-`npm run dev`
+  ```bash
+  git clone https://github.com/vjchen03/perceptrix2.0.git
+  cd perceptrix2.0
+  ```
 
-get the app running: <br />
-`npm run build` <br />
-`npm run preview`
+**Install dependencies:**
+
+  ```bash
+  npm install
+  ```
+
+**Run the development server:**
+
+  ```bash
+  npm run dev
+  ```
+
+**Build the application:**
+
+  ```bash
+  npm run build
+  ```
+
+**Preview the production build:**
+
+  ```bash
+  npm run preview
+  ```
