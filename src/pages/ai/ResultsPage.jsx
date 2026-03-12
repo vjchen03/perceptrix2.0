@@ -32,17 +32,31 @@ export default function ResultsPage() {
               <p style={styles.resultText}>{analysis.faceShape}</p>
             </div>
           )}
+
+          {Array.isArray(analysis?.recommendedFrames) && (
+            <div style={styles.block}>
+              <h3 style={styles.label}>Best Frame Styles</h3>
+              <ul style={styles.list}>
+                {analysis.recommendedFrames.map((frame, index) => (
+                  <li key={index} style={styles.listItem}>
+                    {frame}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Reasoning */}
       {analysis?.summary && (
         <div style={styles.reasoningBox}>
-          <em>{analysis.summary}</em>
+          <h3 style={styles.reasoningTitle}>Analysis Summary</h3>
+          <p style={styles.reasoningText}>{analysis.summary}</p>
         </div>
       )}
 
-{/* Error */}
+      {/* Error */}
       {error && <p style={styles.error}>❌ {error}</p>}
 
       <button onClick={handleRetry} style={styles.button}>🔁 Try Another Photo</button>

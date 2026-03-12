@@ -34,20 +34,24 @@ function classifyFaceShape(landmarks) {
   const jawToCheek = jawWidth / cheekboneWidth;
   const foreheadToCheek = foreheadWidth / cheekboneWidth;
 
-  let faceShape = "oval";
+  let faceShape = "Oval";
 
   if (lengthToWidth > 1.55) {
-    faceShape = "oblong";
+    if (jawToCheek > 0.93 && foreheadToCheek > 0.93) {
+      faceShape = "Rectangle";
+    } else {
+      faceShape = "Oblong";
+    }
   } else if (jawToCheek > 0.93 && foreheadToCheek > 0.93) {
-    faceShape = "square";
+    faceShape = "Square";
   } else if (foreheadToCheek > 1.0 && jawToCheek < 0.9) {
-    faceShape = "heart";
+    faceShape = "Heart";
   } else if (cheekboneWidth > foreheadWidth && cheekboneWidth > jawWidth && lengthToWidth < 1.45) {
-    faceShape = "diamond";
+    faceShape = "Diamond";
   } else if (lengthToWidth < 1.35 && jawToCheek < 0.93) {
-    faceShape = "round";
+    faceShape = "Round";
   } else {
-    faceShape = "oval";
+    faceShape = "Oval";
   }
 
   const features = {
@@ -73,19 +77,66 @@ function classifyFaceShape(landmarks) {
         : "moderately longer than wide",
   };
 
-  const summaryMap = {
-    oval: "Your face appears balanced with softly curved proportions. This usually means the forehead, cheekbones, and jawline are fairly harmonious.",
-    round: "Your face appears softer and less angular, with fuller cheeks and a shorter overall length. The width and length look relatively similar.",
-    square: "Your face appears structured with a broader jawline and balanced width through the forehead and cheeks. The angles look more defined than rounded.",
-    heart: "Your face appears wider through the forehead and cheek area, tapering down toward the jaw and chin. This creates a top-heavy, softly pointed balance.",
-    oblong: "Your face appears longer than it is wide, with an elongated vertical proportion. The forehead, cheeks, and jawline look relatively even in width.",
-    diamond: "Your face appears widest at the cheekbones, with a narrower forehead and jawline. This gives the face a more tapered look at both top and bottom.",
+  const faceShapeInfo = {
+    Oval: {
+      summary:
+        "Your face appears balanced with softly curved proportions. The forehead, cheekbones, and jawline look fairly harmonious.",
+      recommendedFrames: ["Rectangular", "Square", "Aviator"],
+      frameWhy:
+        "Oval faces are balanced, so most frame shapes work well. Angular styles can add definition."
+    },
+    Round: {
+      summary:
+        "Your face appears softer and less angular, with fuller cheeks and a width and length that are relatively similar.",
+      recommendedFrames: ["Rectangular", "Angular", "Cat-Eye"],
+      frameWhy:
+        "Angular frames add contrast and help create more definition for softer facial proportions."
+    },
+    Square: {
+      summary:
+        "Your face appears structured with a broad jawline and balanced width through the forehead and cheeks.",
+      recommendedFrames: ["Round", "Oval", "Rimless"],
+      frameWhy:
+        "Softer frame shapes help balance stronger angles and a broader jawline."
+    },
+    heart: {
+      summary:
+        "Your face appears wider through the forehead and cheek area, tapering toward a narrower chin.",
+      recommendedFrames: ["Oval", "Bottom-Heavy", "Rimless"],
+      frameWhy:
+        "These frames help balance a wider forehead and a narrower chin."
+    },
+    Diamond: {
+      summary:
+        "Your face appears widest at the cheekbones, with a narrower forehead and jawline.",
+      recommendedFrames: ["Oval", "Cat-Eye", "Rimless"],
+      frameWhy:
+        "These styles complement wider cheekbones and narrower forehead and jaw proportions."
+    },
+    Oblong: {
+      summary:
+        "Your face appears longer than it is wide, with relatively even proportions and a softer elongated appearance.",
+      recommendedFrames: ["Oversized", "Tall Frames", "Round"],
+      frameWhy:
+        "Deeper or taller frames help add balance to longer facial proportions."
+    },
+    Rectangle: {
+      summary:
+        "Your face appears longer than it is wide with straighter lines and a stronger jawline.",
+      recommendedFrames: ["Round", "Oval", "Oversized"],
+      frameWhy:
+        "Softer or deeper frames help balance longer and more angular facial proportions."
+    }
   };
+
+  const info = faceShapeInfo[faceShape];
 
   return {
     faceShape,
     features,
-    summary: summaryMap[faceShape],
+    summary: info.summary,
+    recommendedFrames: info.recommendedFrames,
+    frameWhy: info.frameWhy
   };
 }
 
