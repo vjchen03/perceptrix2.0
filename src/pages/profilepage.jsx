@@ -1,53 +1,73 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../context/authContext";
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+// import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   // Use useEffect for navigation instead of doing it during render
+  const [frames, setFrames] = useState([]);
+  const [frameNames, setFrameNames] = useState([]);
+  // const [loadingFrames, setLoadingFrames] = useState(true);
+
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, navigate]);
+  //     if (!user) {
+  //     navigate("/login");
+  //   }
+  // }, [user, navigate]);
+    const loadFrames = () => {
+      if (!user) return;
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
+      const storageKey = `savedFrames_${user.uid}`;
+      const savedFrames = JSON.parse(localStorage.getItem(storageKey)) || {};
 
-  // Don't render anything if user is not authenticated
-  if (!user) {
-    return null; // Return null while the effect handles the redirect
-  }
+      setFrames(Object.values(savedFrames));
+      setFrameNames(Object.keys(savedFrames));
+    };
 
-  // load saved images in firebase storage
-  const storage = getStorage();
-  const framesRef = ref(storage, `users/${user.uid}/images/`);
-  const [frames, setFrames] = React.useState([]);
-  const [frameNames, setFrameNames] = React.useState([]);
-  useEffect(() => {
-    const fetchFrames = async () => {
+    loadFrames();
+
+    window.addEventListener("focus", loadFrames);
+    return () => window.removeEventListener("focus", loadFrames);
+
+  }, [user]);
+
+    const handleLogout = async () => {
       try {
-        const res = await listAll(framesRef);
-        const urls = await Promise.all(res.items.map(item => getDownloadURL(item)));
-        setFrames(urls);
-        setFrameNames(await res.items.map(item => item.name.split(".")[0]));
+        await signOut(auth);
+        navigate("/");
       } catch (error) {
-        console.error("Error fetching frames:", error);
+        console.error("Error signing out:", error);
       }
     };
-    fetchFrames();
-  }, []);
+
+    // Don't render anything if user is not authenticated
+    if (!user) {
+      return null; // Return null while the effect handles the redirect
+    }
+
+  //   // load saved images in firebase storage
+  // const storage = getStorage();
+  // const framesRef = ref(storage, `users/${user.uid}/images/`);
+  // const [frames, setFrames] = React.useState([]);
+  // const [frameNames, setFrameNames] = React.useState([]);
+  // useEffect(() => {
+  //   const fetchFrames = async () => {
+  //     try {
+  //       const res = await listAll(framesRef);
+  //       const urls = await Promise.all(res.items.map(item => getDownloadURL(item)));
+  //       setFrames(urls);
+  //       setFrameNames(await res.items.map(item => item.name.split(".")[0]));
+  //     } catch (error) {
+  //       console.error("Error fetching frames:", error);
+  //     }
+  //   };
+  //   fetchFrames();
+  // }, []);
   return (
     <div style={styles.wrapper}>
       <h1 style={styles.title}>Profile</h1>
@@ -99,16 +119,16 @@ const ProfilePage = () => {
         </div>
       )}
       {frames.length > 0 && (
-        <div>
-          <div style={styles.grid}>
-            {frames.map((frame, index) => (
-              // frame with name next to it
+        // <div>
+        <div style={styles.grid}>
+          {frames.map((frame, index) => (
+            // frame with name next to it
               <div key={index} style={{display: 'flex', flexDirection: 'column', alignItems: 'center', padding:0}}>
-                <img src={frame} alt={`Frame ${index}`} style={styles.image} />
-                <p>{frameNames[index]}</p>
-              </div>
-            ))}
-          </div>
+              <img src={frame} alt={`Frame ${index}`} style={styles.image} />
+              <p>{frameNames[index]}</p>
+            </div>
+          ))}
+          {/* </div> */}
         </div>
       )}
     </div>
@@ -118,14 +138,14 @@ const ProfilePage = () => {
 export default ProfilePage;
 
 const styles = {
-  imageContainer: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#f8f8f8",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  // imageContainer: {
+  //   width: "100%",
+  //   height: "100%",
+  //   backgroundColor: "#f8f8f8",
+  //   display: "flex",
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  // },
   image: {
     width: '100%',
     height: '200px',

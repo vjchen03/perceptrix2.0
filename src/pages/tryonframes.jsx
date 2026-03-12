@@ -5,7 +5,7 @@ import '@tensorflow/tfjs-backend-webgl';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FRAMES } from './Frames';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getStorage, ref, uploadBytes, deleteObject } from 'firebase/storage';
+// import { getStorage, ref, uploadBytes, deleteObject } from 'firebase/storage';
 
 export function TryOnFramesGrid() {
   const navigate = useNavigate();
@@ -72,36 +72,71 @@ export function TryOnFrame() {
     const saveImage = async () => {
       const auth = getAuth();
       const user = auth.currentUser;
-      if (!user) {
-        console.error('User not authenticated');
-        return;
-      }
+      // if (!user) {
+      //   console.error('User not authenticated');
+      //   return;
+      // }
+
+      if (!canvasRef.current || !frameObject || !user) return;
+
+      const storageKey = `savedFrames_${user.uid}`;
+      const savedFrames = JSON.parse(localStorage.getItem(storageKey)) || {};
+
       if (isSaved) {
         const canvas = canvasRef.current;
-        const dataUrl = canvas.toDataURL('image/jpeg');
-        const blob = await (await fetch(dataUrl)).blob();
-        const userPath = `users/${user.uid}/images/${frameObject.name}.jpg`;
-        const storage = getStorage();
-        const storageRef = ref(storage, userPath);
+    // old firebase reliant code
+    //     const dataUrl = canvas.toDataURL('image/jpeg');
+    //     const blob = await (await fetch(dataUrl)).blob();
+    //     const userPath = `users/${user.uid}/images/${frameObject.name}.jpg`;
+    //     const storage = getStorage();
+    //     const storageRef = ref(storage, userPath);
         
-        uploadBytes(storageRef, blob).then(() => {
-          console.log('Image saved successfully!');
-        }).catch((error) => {
-          console.error('Error saving image:', error);
-        });
-      } else if (isSaved === false) {
-        const storage = getStorage();
-        const storageRef = ref(storage, `users/${user.uid}/images/${frameObject.name}.jpg`);
+    //     uploadBytes(storageRef, blob).then(() => {
+    //       console.log('Image saved successfully!');
+    //     }).catch((error) => {
+    //       console.error('Error saving image:', error);
+    //     });
+    //   } else if (isSaved === false) {
+    //     const storage = getStorage();
+    //     const storageRef = ref(storage, `users/${user.uid}/images/${frameObject.name}.jpg`);
 
-        deleteObject(storageRef).then(() => {
-          console.log('Image deleted successfully!');
-        }).catch((error) => {
-          console.error('Error deleting image:', error);
-        });
+    //     deleteObject(storageRef).then(() => {
+    //       console.log('Image deleted successfully!');
+    //     }).catch((error) => {
+    //       console.error('Error deleting image:', error);
+    //     });
+    //   }
+    // }
+
+        const previewCanvas = document.createElement("canvas");
+        const ctx = previewCanvas.getContext("2d");
+
+        const maxWidth = 300;
+        const scale = maxWidth / canvas.width;
+
+        previewCanvas.width = maxWidth;
+        previewCanvas.height = canvas.height * scale;
+
+        ctx.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+
+        const dataUrl = previewCanvas.toDataURL("image/jpeg", 0.6);
+
+        savedFrames[frameObject.name] = dataUrl;
+        console.log("Saved frame:", frameObject.name);
+      } else {
+        delete savedFrames[frameObject.name];
+        console.log("Removed frame:", frameObject.name);
       }
-    }
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(savedFrames));
+      } catch (error) {
+        console.error("Failed to save frame locally:", error);
+        alert("You’ve reached local storage space. Try removing an older saved frame.");
+      }
+    };
     saveImage();
-  }, [isSaved]);
+  }, [isSaved, frameObject]);
 
   useEffect(() => {
     if (!userPhoto || !frameObject) return;
@@ -188,7 +223,7 @@ export function TryOnFrame() {
     </button>
 
     <button
-      onClick={() => setIsSaved(!isSaved)}
+      onClick={() => setIsSaved(prev => !prev)}
       style={{
         ...styles.saveButton,
         backgroundColor: isSaved ? '#4caf50' : '#f0f0f0',
